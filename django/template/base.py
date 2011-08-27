@@ -2,6 +2,7 @@ import re
 from functools import partial
 from inspect import getargspec
 
+from django.apps import cache
 from django.conf import settings
 from django.template.context import Context, RequestContext, ContextPopException
 from django.utils.importlib import import_module
@@ -1046,7 +1047,7 @@ def get_templatetags_modules():
     if not templatetags_modules:
         _templatetags_modules = []
         # Populate list once per thread.
-        for app_module in ['django'] + list(settings.INSTALLED_APPS):
+        for app_module in ['django'] + [app._meta.name for app in cache.loaded_apps]:
             try:
                 templatetag_module = '%s.templatetags' % app_module
                 import_module(templatetag_module)
